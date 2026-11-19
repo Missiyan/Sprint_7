@@ -1,0 +1,1 @@
+{"uuid": "ca1524bb-dd9f-489c-a364-422152bcdc9c", "befores": [{"name": "mis_field", "status": "passed", "start": 1795118057999, "stop": 1795118057999}], "afters": [{"name": "mis_field::<lambda>", "start": 1795118058420}], "start": 1795118057999, "stop": 1795118058420}
