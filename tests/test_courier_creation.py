@@ -1,37 +1,26 @@
 import allure
 import pytest
-import uuid
 import requests
 from urls import COURIER_URL
 from data import (
     COURIER_CREATE_MIS_FIELD_TEXT,
+    COURIER_DUPLICATE_LOGIN_TEXT,
     STATUS_CREATED,
     STATUS_BAD_REQUEST,
     STATUS_CONFLICT,
 )
-from scripts import login_courier, delete_courier
 
 @allure.feature("Курьер")
 @allure.story("Создание курьера")
 class TestCourierCreation:
 
     @allure.title("Создание курьера - успех")
-    def test_create_courier_success(self):
-        login = "courier_" + uuid.uuid4().hex[:10]
-        payload = {"login": login, "password": "pass", "firstName": "name"}
+    def test_create_courier_success(self, created_courier_response):
+        response, login, password = created_courier_response
 
-        try:
-            with allure.step("Отправить POST /api/v1/courier"):
-                response = requests.post(COURIER_URL, data=payload)
-
-            with allure.step("Проверить код 201 и тело {'ok': true}"):
-                assert response.status_code == STATUS_CREATED
-                assert response.json() == {"ok": True}
-        finally:
-            with allure.step("Удалить курьера после теста"):
-                courier_id = login_courier(login, "pass")
-                if courier_id:
-                    delete_courier(courier_id)
+        with allure.step("Проверить код 201 и тело {'ok': true}"):
+            assert response.status_code == STATUS_CREATED
+            assert response.json() == {"ok": True}
 
     @allure.title("Создание дубликата курьера - ошибка 409")
     def test_create_duplicate_courier_error(self, courier):
@@ -44,9 +33,9 @@ class TestCourierCreation:
         with allure.step("Повторно отправить POST /api/v1/courier"):
             response = requests.post(COURIER_URL, data=payload)
 
-        with allure.step("Проверить код 409 и сообщение об ошибке"):
+        with allure.step("Проверить код 409 и сообщение об ошибки"):
             assert response.status_code == STATUS_CONFLICT
-            assert "message" in response.json()
+            assert response.json()["message"] == COURIER_DUPLICATE_LOGIN_TEXT
 
     @allure.title("Создание курьера без поля '{mis_field}' - ошибка 400")
     @pytest.mark.parametrize("mis_field", ["login", "password"])
@@ -63,4 +52,4 @@ class TestCourierCreation:
 
         with allure.step("Проверить код 400 и текст ошибки"):
             assert response.status_code == STATUS_BAD_REQUEST
-            assert COURIER_CREATE_MIS_FIELD_TEXT in response.text
+            assert response.json()["message"] == COURIER_CREATE_MIS_FIELD_TEXT

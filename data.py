@@ -1,7 +1,7 @@
 COURIER_CREATE_MIS_FIELD_TEXT = "Недостаточно данных для создания учетной записи"
 COURIER_LOGIN_MIS_FIELD_TEXT = "Недостаточно данных для входа"
-COURIER_DUPLICATE_LOGIN_TEXT = "Этот логин уже используется"
-COURIER_LOGIN_NOT_FOUND_TEXT = "Учетной записи с таким логином и паролем нет"
+COURIER_DUPLICATE_LOGIN_TEXT = "Этот логин уже используется. Попробуйте другой."
+COURIER_LOGIN_NOT_FOUND_TEXT = "Учетная запись не найдена"
 
 STATUS_OK = 200
 STATUS_CREATED = 201

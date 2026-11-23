@@ -5,6 +5,7 @@ import requests
 from urls import COURIER_LOGIN_URL
 from data import (
     COURIER_LOGIN_MIS_FIELD_TEXT,
+    COURIER_LOGIN_NOT_FOUND_TEXT,
     STATUS_OK,
     STATUS_BAD_REQUEST,
     STATUS_NOT_FOUND,
@@ -36,7 +37,7 @@ class TestCourierLogin:
 
         with allure.step("Проверить код 404 и наличие message"):
             assert response.status_code == STATUS_NOT_FOUND
-            assert "message" in response.json()
+            assert response.json()["message"] == COURIER_LOGIN_NOT_FOUND_TEXT
 
     @allure.title("Логин под несуществующим пользователем - ошибка 404")
     def test_login_nonexistent_user(self):
@@ -47,7 +48,7 @@ class TestCourierLogin:
 
         with allure.step("Проверить код 404 и наличие message"):
             assert response.status_code == STATUS_NOT_FOUND
-            assert "message" in response.json()
+            assert response.json()["message"] == COURIER_LOGIN_NOT_FOUND_TEXT
 
     @allure.title("Логин без поля '{mis_field}' - ошибка")
     @pytest.mark.parametrize("mis_field", ["login", "password"])
@@ -58,7 +59,7 @@ class TestCourierLogin:
         with allure.step(f"Отправить POST /api/v1/courier/login без поля {mis_field}"):
             response = requests.post(COURIER_LOGIN_URL, data=payload)
 
-        with allure.step("Проверить код 400 или 504 (стенд нестабилен)"):
+        with allure.step("Проверить код и текст ошибки"):
             assert response.status_code in (STATUS_BAD_REQUEST, STATUS_GATEWAY_TIMEOUT)
             if response.status_code == STATUS_BAD_REQUEST:
-                assert COURIER_LOGIN_MIS_FIELD_TEXT in response.text
+                assert response.json()["message"] == COURIER_LOGIN_MIS_FIELD_TEXT
